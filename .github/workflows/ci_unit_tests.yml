@@ -1,5 +1,5 @@
 name: Unit test - CI
-run-name: (CI) - Unit testing on branch ${{ github.ref_name }} by ${{ github.actor }}
+run-name: (CI - ${{ github.ref_name }}) - Unit testing
 on:
   workflow_dispatch:
   push:
@@ -24,6 +24,7 @@ jobs:
 
       - name: Archive test results
         uses: actions/upload-artifact@v3
+        if: always()
         with:
           name: test-results
           path: target/surefire-reports
