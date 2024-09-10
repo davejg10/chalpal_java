@@ -1,0 +1,13 @@
+name: Unit test - PR into main
+run-name: (PR) - Unit testing; ${{ github.head_ref }} -> ${{ github.base_ref }} by ${{ github.actor }}
+on:
+  pull_request:
+    branches: main
+    paths:
+      - 'src/**'
+
+jobs:
+  pr-unit-testing:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Unit testing workflow PR"
