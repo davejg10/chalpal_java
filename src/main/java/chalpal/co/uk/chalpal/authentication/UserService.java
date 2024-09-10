@@ -23,7 +23,7 @@ public class UserService {
     }
 
     public UserDTO getUser(String email) throws UserNotFoundException, ClientNullRequestException {
-        if (email == null || email.isEmpty()) throw new ClientNullRequestException("The email field cannot be empty!");
+        if (email == null || email.trim().isEmpty()) throw new ClientNullRequestException("The email field cannot be empty!");
         User user = userRepository.findByEmail(email);
         if (user == null) throw new UserNotFoundException(email);
 

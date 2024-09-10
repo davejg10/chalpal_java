@@ -46,12 +46,12 @@ public class UserControllerTest {
     @MockBean
     private LoggingService loggingService;
 
-
     private final String email = "an@email.com";
 
     record UserRequest(String email){};
+
     @Test
-    void newUser_shouldReturn201WrappedUserDTO_whenUserEmailDoesntExist() throws Exception {
+    void registerUser_shouldReturn201WrappedUserDTO_whenUserEmailDoesntExist() throws Exception {
         UserRequest newUser = new UserRequest(email);
         UserDTO returnedUser = new UserDTO(1, email);
         when(userService.createUser(any(UserDTO.class))).thenReturn(returnedUser);
@@ -65,7 +65,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void newUser_shouldReturnConflictRequest_whenUserEmailExists() throws Exception {
+    void registerUser_shouldReturnConflictRequest_whenUserEmailExists() throws Exception {
         UserRequest newUser = new UserRequest(email);
         when(userService.createUser(any(UserDTO.class))).thenThrow(new UserExistsException(email));
 
@@ -78,7 +78,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void newUser_shouldReturnBadRequest_whenUserEmailIsNull() throws Exception {
+    void registerUser_shouldReturnBadRequest_whenUserEmailIsNull() throws Exception {
         UserRequest newUser = new UserRequest(null);
         when(userService.createUser(any(UserDTO.class))).thenThrow(new ClientNullRequestException("The email field cannot be empty!"));
 
@@ -91,7 +91,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void newUser_shouldReturnBadRequest_whenUserEmailIsEmpty() throws Exception {
+    void registerUser_shouldReturnBadRequest_whenUserEmailIsEmpty() throws Exception {
         UserRequest newUser = new UserRequest("");
         when(userService.createUser(any(UserDTO.class))).thenThrow(new ClientNullRequestException("The email field cannot be empty!"));
 
@@ -104,42 +104,43 @@ public class UserControllerTest {
     }
 
     @Test
-    void getUser_shouldReturn200WrappedUserDTO_whenUserEmailExists() throws Exception {
-        UserRequest existingUser = new UserRequest(email);
+    void loginUser_shouldReturn200WrappedUserDTO_whenUserEmailExists() throws Exception {
         UserDTO returnedUser = new UserDTO(1, email);
         when(userService.getUser(any(String.class))).thenReturn(returnedUser);
 
-        MvcResult mvcResult = mockMvc.perform(get(String.format("/users/%s", email))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(existingUser)))
+        MvcResult mvcResult = mockMvc.perform(get(String.format("/users/%s", email)))
                 .andExpect(status().isOk())
                 .andExpect(content().string(objectMapper.writeValueAsString(returnedUser)))
                 .andReturn();
     }
 
     @Test
-    void getUser_shouldReturn400_whenUserEmailIsEmpty() throws Exception {
-        UserRequest existingUser = new UserRequest("");
+    void loginUser_shouldReturn404_whenUserEmailIsEmpty() throws Exception {
+
+        MvcResult mvcResult = mockMvc.perform(get("/users/")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andReturn();
+    }
+
+    @Test
+    void loginUser_shouldReturn400_whenUserEmailIsBlank() throws Exception {
         when(userService.getUser(any(String.class))).thenThrow(new ClientNullRequestException("The email field cannot be empty!"));
 
-        MvcResult mvcResult = mockMvc.perform(get(String.format("/users/%s", email))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(existingUser)))
+        MvcResult mvcResult = mockMvc.perform(get(String.format("/users/%s", " ")))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("The email field cannot be empty!"))
                 .andReturn();
     }
 
     @Test
-    void getUser_shouldReturn404_whenUserEmailDoesntExist() throws Exception {
-        UserRequest existingUser = new UserRequest(email);
-        when(userService.getUser(any(String.class))).thenThrow(new UserNotFoundException(email));
+    void loginUser_shouldReturn404_whenUserEmailDoesntExist() throws Exception {
+        String invalidUser = "invalid@email";
+        when(userService.getUser(any(String.class))).thenThrow(new UserNotFoundException(invalidUser));
 
-        MvcResult mvcResult = mockMvc.perform(get(String.format("/users/%s", email))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(existingUser)))
+        MvcResult mvcResult = mockMvc.perform(get(String.format("/users/%s", invalidUser)))
                 .andExpect(status().isNotFound())
-                .andExpect(contentContains("The user with email: " + email + " does not exist."))
+                .andExpect(contentContains("The user with email: " + invalidUser + " does not exist."))
                 .andReturn();
     }
 }

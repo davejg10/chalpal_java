@@ -53,7 +53,7 @@ public class UserIntegrationTest {
     record UserRequest(String email) {};
 
     @Test
-    public void postUsersEndpoint_shouldReturnJsonUser_whenUserEmailDoesntExist() throws Exception {
+    public void registerUser_shouldReturnJsonUser_whenUserEmailDoesntExist() throws Exception {
         String url = "http://localhost:" + port + "/users";
 
         String newEmail = "an@email.com";
@@ -71,8 +71,7 @@ public class UserIntegrationTest {
     }
 
     @Test
-    @Transactional
-    public void postUsersEndpoint_shouldReturnConflictError_whenUserEmailExists() throws Exception {
+    public void registerUser_shouldReturnConflictError_whenUserEmailExists() throws Exception {
         String url = "http://localhost:" + port + "/users";
         UserRequest newUser = new UserRequest(existingEmail);
         HttpHeaders headers = new HttpHeaders();
@@ -87,7 +86,7 @@ public class UserIntegrationTest {
     }
 
     @Test
-    public void postUsersEndpoint_shouldReturnBadRequest_whenUserEmailIsNull() throws Exception {
+    public void registerUser_shouldReturnBadRequest_whenUserEmailIsNull() throws Exception {
         String url = "http://localhost:" + port + "/users";
         UserRequest newUser = new UserRequest(null);
 
@@ -103,7 +102,7 @@ public class UserIntegrationTest {
     }
 
     @Test
-    public void postUsersEndpoint_shouldReturnBadRequest_whenUserEmailIsEmpty() throws Exception {
+    public void registerUser_shouldReturnBadRequest_whenUserEmailIsEmpty() throws Exception {
         String url = "http://localhost:" + port + "/users";
         UserRequest newUser = new UserRequest("");
 
@@ -119,7 +118,7 @@ public class UserIntegrationTest {
     }
 
     @Test
-    public void getUser_shouldReturnUser_whenUserEmailExists() throws Exception {
+    public void loginUser_shouldReturnUser_whenUserEmailExists() throws Exception {
         Integer existingUserId = userRepository.findByEmail(existingEmail).getId();
         String url = String.format("http://localhost:%s/users/%s", port, existingEmail);
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
@@ -129,8 +128,8 @@ public class UserIntegrationTest {
     }
 
     @Test
-    public void getUser_shouldThrowClientNullException_whenUserEmailIsEmpty() {
-        String url = String.format("http://localhost:%s/users/%s", port, "");
+    public void loginUser_shouldThrowClientNullException_whenUserEmailIsBlank() {
+        String url = String.format("http://localhost:%s/users/%s", port, " ");
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -138,13 +137,12 @@ public class UserIntegrationTest {
     }
 
     @Test
-    public void getUser_shouldThrowUserNotFoundError_whenUserEmailDoesntExist() {
+    public void loginUser_shouldThrowUserNotFoundError_whenUserEmailDoesntExist() {
         String invalidEmail = "random@email.com";
         String url = String.format("http://localhost:%s/users/%s", port, invalidEmail);
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(response.getBody()).contains("The user with email: " + invalidEmail + " does not exist.");
-
     }
 }

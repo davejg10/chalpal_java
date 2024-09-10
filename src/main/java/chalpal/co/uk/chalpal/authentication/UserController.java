@@ -15,7 +15,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping(path="/users")
-    public ResponseEntity<UserDTO> registerUser (@RequestBody UserDTO user) {
+    public ResponseEntity<UserDTO> registerUser(@RequestBody UserDTO user) {
         UserDTO newUser = userService.createUser(user);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -23,7 +23,7 @@ public class UserController {
     }
 
     @GetMapping(path={"/users/{email}"})
-    UserDTO loginUser(@PathVariable(required = false) String email) {
+    UserDTO loginUser(@PathVariable("email") String email) {
         return userService.getUser(email);
     }
 }
