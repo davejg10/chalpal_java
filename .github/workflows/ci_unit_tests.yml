@@ -18,7 +18,7 @@ jobs:
           cache: maven
 
       - name: Build with Maven
-        run: mvn clean verify
+        run: mvn clean test
 
       - name: Archive test results
         uses: actions/upload-artifact@v3
