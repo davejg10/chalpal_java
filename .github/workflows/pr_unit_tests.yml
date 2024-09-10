@@ -4,8 +4,6 @@ run-name: (PR - ${{ github.head_ref }} -> ${{ github.base_ref }}) - Unit testing
 on:
   pull_request:
     branches: main
-    paths:
-      - 'src/**'
 
 jobs:
   pr-unit-testing:
@@ -27,5 +25,5 @@ jobs:
         uses: actions/upload-artifact@v3
         if: always()
         with:
-          name: test-results
+          name: mvn-test-results
           path: target/surefire-reports
