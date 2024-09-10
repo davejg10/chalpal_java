@@ -18,7 +18,7 @@ jobs:
           distribution: 'oracle'
           cache: maven
 
-      - name: Build with Maven
+      - name: Verify with Maven
         run: mvn clean verify
 
       - name: Archive test results
