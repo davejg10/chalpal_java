@@ -1,0 +1,12 @@
+name: Unit test - CI
+run-name: (CI) - Unit testing on branch ${{ github.ref_name }} by ${{ github.actor }}
+on:
+  push:
+    paths:
+      - 'src/**'
+
+jobs:
+  ci-unit-testing:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Unit testing workflow CI"
